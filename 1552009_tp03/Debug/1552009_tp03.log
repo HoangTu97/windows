@@ -1,0 +1,10 @@
+﻿  1552009_tp03.cpp
+d:\visual\window\1552009_tp03\1552009_tp03\1552009_tp03.cpp(225): warning C4018: '<': signed/unsigned mismatch
+d:\visual\window\1552009_tp03\1552009_tp03\1552009_tp03.cpp(586): warning C4018: '<': signed/unsigned mismatch
+d:\visual\window\1552009_tp03\1552009_tp03\1552009_tp03.cpp(734): warning C4018: '<': signed/unsigned mismatch
+d:\visual\window\1552009_tp03\1552009_tp03\1552009_tp03.cpp(762): warning C4018: '<': signed/unsigned mismatch
+d:\visual\window\1552009_tp03\1552009_tp03\1552009_tp03.cpp(774): warning C4018: '<': signed/unsigned mismatch
+d:\visual\window\1552009_tp03\1552009_tp03\1552009_tp03.cpp(799): warning C4018: '<': signed/unsigned mismatch
+d:\visual\window\1552009_tp03\1552009_tp03\1552009_tp03.cpp(898): warning C4101: 'szBuffer': unreferenced local variable
+  1552009_tp03.vcxproj -> D:\visual\window\1552009_tp03\Debug\1552009_tp03.exe
+  1552009_tp03.vcxproj -> D:\visual\window\1552009_tp03\Debug\1552009_tp03.pdb (Partial PDB)
