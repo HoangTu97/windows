@@ -15,6 +15,7 @@
 #define IDB_BITMAP1                     130
 #define IDD_PEN                         131
 #define IDD_BRUSH                       132
+#define IDD_TEXT                        133
 #define IDC_PEN_WIDTH                   1001
 #define IDC_PREVIEW_PEN                 1002
 #define IDC_PEN_STYLE_SOLID             1003
@@ -38,8 +39,11 @@
 #define IDC_BRUSH_HATCH_VERTICAL        1019
 #define IDC_BRUSH_HATCH_HORIZONTAL      1020
 #define IDC_BRUSH_HATCH_BDIAGONAL       1021
+#define IDC_TEXT                        1021
 #define IDC_BRUSH_HATCH_FDIAGONAL       1022
+#define IDC_PREVIEW_TEXT                1022
 #define IDC_BRUSH_HATCH_CROSS           1023
+#define IDC_FONT                        1023
 #define IDC_BRUSH_HATCH_FDIAGONAL3      1024
 #define IDC_BRUSH_HATCH_DIAGCROSS       1024
 #define ID_SHAPE_RANDOM                 32779
@@ -90,6 +94,10 @@
 #define ID_FILE_SAVEBMP                 32824
 #define ID_SHAPE_TEXT                   32825
 #define ID_EDIT_SELECT                  32826
+#define ID_EDIT_COPY                    32827
+#define ID_EDIT_PAST                    32828
+#define ID_EDIT_PASTE                   32829
+#define ID_EDIT_CUT                     32830
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -97,9 +105,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        133
-#define _APS_NEXT_COMMAND_VALUE         32827
-#define _APS_NEXT_CONTROL_VALUE         1021
+#define _APS_NEXT_RESOURCE_VALUE        134
+#define _APS_NEXT_COMMAND_VALUE         32831
+#define _APS_NEXT_CONTROL_VALUE         1024
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

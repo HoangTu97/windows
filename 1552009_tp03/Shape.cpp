@@ -3,22 +3,17 @@
 
 Shape * Shape::factory(int method)
 {
-	if (method == DRAW_LINE)
-		return new MLine;
-	else if (method == DRAW_RECT)
-		return new MRectangle;
-	else if (method == DRAW_ELLIPSE)
-		return new MEllipse;
-	else if (method == DRAW_RANDOM)
-		return new MRandom;
-	else if (method == DRAW_SQUARE)
-		return new MSquare;
-	else if (method == DRAW_ROUND)
-		return new MRound;
-	else if (method == DRAW_IMAGE)
-		return new MImage;
-	else
-		return NULL;
+	switch (method) {
+	case DRAW_LINE:		return new MLine;
+	case DRAW_RECT:		return new MRectangle;
+	case DRAW_ELLIPSE:	return new MEllipse;
+	case DRAW_RANDOM:	return new MRandom;
+	case DRAW_SQUARE:	return new MSquare;
+	case DRAW_ROUND:	return new MRound;
+	case DRAW_IMAGE:	return new MImage;
+	case DRAW_TEXT:		return new MText;
+	default:			return NULL;
+	}
 }
 
 void Shape::setColor(COLORREF strokeColor)
@@ -219,6 +214,24 @@ LPWSTR MRectangle::getFilename()
 	return LPWSTR();
 }
 
+void MRectangle::setText(LPWSTR)
+{
+}
+
+LPWSTR MRectangle::getText()
+{
+	return LPWSTR();
+}
+
+void MRectangle::setFont(HFONT)
+{
+}
+
+HFONT MRectangle::getFont()
+{
+	return HFONT();
+}
+
 void MRectangle::draw(HDC buffDC)
 {
 	if (this->isHidden()) return;
@@ -303,6 +316,24 @@ LPWSTR MRandom::getFilename()
 	return LPWSTR();
 }
 
+void MRandom::setText(LPWSTR)
+{
+}
+
+LPWSTR MRandom::getText()
+{
+	return LPWSTR();
+}
+
+void MRandom::setFont(HFONT)
+{
+}
+
+HFONT MRandom::getFont()
+{
+	return HFONT();
+}
+
 void MRandom::draw(HDC buffDC)
 {
 	if (this->isHidden()) return;
@@ -377,6 +408,24 @@ void MLine::setFilename(LPWSTR)
 LPWSTR MLine::getFilename()
 {
 	return LPWSTR();
+}
+
+void MLine::setText(LPWSTR)
+{
+}
+
+LPWSTR MLine::getText()
+{
+	return LPWSTR();
+}
+
+void MLine::setFont(HFONT)
+{
+}
+
+HFONT MLine::getFont()
+{
+	return HFONT();
 }
 
 void MLine::draw(HDC buffDC)
@@ -459,6 +508,24 @@ void MEllipse::setFilename(LPWSTR)
 LPWSTR MEllipse::getFilename()
 {
 	return LPWSTR();
+}
+
+void MEllipse::setText(LPWSTR)
+{
+}
+
+LPWSTR MEllipse::getText()
+{
+	return LPWSTR();
+}
+
+void MEllipse::setFont(HFONT)
+{
+}
+
+HFONT MEllipse::getFont()
+{
+	return HFONT();
 }
 
 void MEllipse::draw(HDC buffDC)
@@ -562,6 +629,24 @@ void MSquare::setFilename(LPWSTR)
 LPWSTR MSquare::getFilename()
 {
 	return LPWSTR();
+}
+
+void MSquare::setText(LPWSTR)
+{
+}
+
+LPWSTR MSquare::getText()
+{
+	return LPWSTR();
+}
+
+void MSquare::setFont(HFONT)
+{
+}
+
+HFONT MSquare::getFont()
+{
+	return HFONT();
 }
 
 void MSquare::draw(HDC buffDC)
@@ -689,6 +774,24 @@ LPWSTR MRound::getFilename()
 	return LPWSTR();
 }
 
+void MRound::setText(LPWSTR)
+{
+}
+
+LPWSTR MRound::getText()
+{
+	return LPWSTR();
+}
+
+void MRound::setFont(HFONT)
+{
+}
+
+HFONT MRound::getFont()
+{
+	return HFONT();
+}
+
 void MRound::draw(HDC buffDC)
 {
 	if (this->isHidden()) return;
@@ -808,6 +911,24 @@ LPWSTR MImage::getFilename()
 	return this->filename;
 }
 
+void MImage::setText(LPWSTR)
+{
+}
+
+LPWSTR MImage::getText()
+{
+	return LPWSTR();
+}
+
+void MImage::setFont(HFONT)
+{
+}
+
+HFONT MImage::getFont()
+{
+	return HFONT();
+}
+
 void MImage::draw(HDC hdc)
 {
 	HDC memDC = CreateCompatibleDC(hdc);
@@ -854,12 +975,24 @@ void MText::setNoneFill()
 {
 }
 
-void MText::MouseMove(POINT)
+void MText::MouseMove(POINT a)
 {
+	if (this->arrPoint.size() < 2) {
+		this->arrPoint.push_back(a);
+	}
+	else {
+		this->arrPoint.back() = a;
+	}
 }
 
-void MText::MouseUp(POINT)
+void MText::MouseUp(POINT a)
 {
+	if (this->arrPoint.size() % 2 == 0) {
+		this->arrPoint.back() = a;
+	}
+	else if (this->arrPoint.size() % 2 != 0) {
+		this->arrPoint.push_back(a);
+	}
 }
 
 void MText::setFilename(LPWSTR)
@@ -871,6 +1004,42 @@ LPWSTR MText::getFilename()
 	return LPWSTR();
 }
 
-void MText::draw(HDC)
+void MText::setText(LPWSTR Text)
 {
+	int i;
+	for (i = 0; Text[i]; i++) {
+		this->text[i] = Text[i];
+	}
+	this->text[i] = '\0';
+}
+
+LPWSTR MText::getText()
+{
+	return this->text;
+}
+
+void MText::setFont(HFONT hFont)
+{
+	this->font = hFont;
+}
+
+HFONT MText::getFont()
+{
+	return this->font;
+}
+
+void MText::draw(HDC hdc)
+{
+	if (this->isHidden()) return;
+
+	RECT rect;
+	rect.bottom = this->arrPoint[0].y;
+	rect.top = this->arrPoint[1].y;
+	rect.left = this->arrPoint[0].x;
+	rect.right = this->arrPoint[1].x;
+	
+	SelectObject(hdc, this->font);
+	SetTextColor(hdc, this->color);
+
+	DrawText(hdc, this->text, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
 }

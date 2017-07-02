@@ -14,6 +14,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 
 //main avariable
 std::vector<Shape *> Shapes;
+std::vector<Shape *> bufShapes;
 int tempMethod = DRAW_RANDOM;
 COLORREF tempColor = RGB(0, 0, 0);
 COLORREF tempFill = RGB(0, 0, 0);
@@ -29,8 +30,10 @@ HDC bufDC;
 HBITMAP bufBMP;
 LPWSTR filename;
 TCHAR szFile[260];
+TCHAR text[260];
 std::vector<int> selectShape;
 RECT selectZone;
+HFONT tempFont;
 //Format pen menu
 DWORD formatPenWidth;
 COLORREF formatPenColor;
@@ -38,6 +41,12 @@ DWORD formatPenStyle;
 //Format brush menu
 LOGBRUSH formatBrush;
 bool formatBrushIsFill;
+//Text menu
+TCHAR formatText[260];
+COLORREF formatTextColor;
+HFONT formatTextFont;
+
+
 
 
 
@@ -59,7 +68,9 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    Pen(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    Brush(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK    Text(HWND, UINT, WPARAM, LPARAM);
 VOID ColorPickerDialog(HWND, COLORREF &);
+VOID FontPickerDialog(HWND, HFONT &, DWORD &);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -200,6 +211,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case ID_FORMAT_BRUSH:
 				DialogBox(hInst, MAKEINTRESOURCE(IDD_BRUSH), hWnd, Brush);
 				break;
+			case ID_SHAPE_TEXT:
+			{
+				control = CONTROL_TEXT;
+				tempMethod = DRAW_TEXT;
+				DialogBox(hInst, MAKEINTRESOURCE(IDD_TEXT), hWnd, Text);
+				break;
+			}
 			case ID_FILE_SAVE:
 			{
 				control = CONTROL_DRAW;
@@ -590,6 +608,58 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					redraw(hWnd, hdc, Shapes);
 				}
 				break;
+			case ID_EDIT_COPY:
+			{
+				control = CONTROL_COPY;
+				while (bufShapes.size())
+					bufShapes.pop_back();
+				for (int i = 0; i < selectShape.size(); i++) {
+					bufShapes.push_back(Shapes[selectShape[i]]);
+				}
+				control = CONTROL_MOVE;
+				break;
+			}
+			case ID_EDIT_PASTE:
+			{
+				redraw(hWnd, hdc, Shapes);
+				control = CONTROL_PASTE;
+				for (int i = 0; i < bufShapes.size(); i++) {
+					Shape * newShape = Shape::factory(bufShapes[i]->type);
+					Shapes.push_back(newShape);
+
+					for (int j = 0; j < bufShapes[i]->arrPoint.size(); j++)
+						Shapes.back()->addPoint(bufShapes[i]->arrPoint[j]);
+
+					Shapes.back()->type = bufShapes[i]->type;
+					Shapes.back()->setColor(bufShapes[i]->getColor());
+					Shapes.back()->setIsFill(bufShapes[i]->checkFill());
+					Shapes.back()->setBrush(bufShapes[i]->getBrush());
+					Shapes.back()->setVisible();
+					Shapes.back()->setStyle(bufShapes[i]->penStyle);
+					Shapes.back()->setFont(bufShapes[i]->getFont());
+					Shapes.back()->setText(bufShapes[i]->getText());
+					Shapes.back()->setWidth(bufShapes[i]->width);
+					statusPos++;
+				}
+				control = CONTROL_MOVE;
+				break;
+			}
+			case ID_EDIT_CUT:
+			{
+				control = CONTROL_CUT;
+				while (bufShapes.size())
+					bufShapes.pop_back();
+				for (int i = 0; i < selectShape.size(); i++) {
+					bufShapes.push_back(Shapes[selectShape[i]]);
+				}
+				for (int i = 0; i < selectShape.size(); i++) {
+					Shapes.erase(Shapes.begin() + selectShape[i]);
+				}
+
+				redraw(hWnd, hdc, Shapes);
+				control = CONTROL_MOVE;
+				break;
+			}
 			case ID_EDIT_DRAW:
 				control = CONTROL_DRAW;
 				break;
@@ -677,7 +747,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			Shapes.push_back(New);
 			Shapes.back()->addPoint(a);
-			if (Shapes.back()->numPoint() % 2 == 1) {
+			if (Shapes.back()->numPoint() < 2) {
 				Shapes.back()->type = tempMethod;
 				Shapes.back()->setColor(tempColor);
 				Shapes.back()->setIsFill(tempIsFill);
@@ -693,6 +763,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			selectZone.left = a.x;
 			selectZone.top = a.y;
+			break;
+		}
+		case CONTROL_TEXT:
+		{
+			while (statusPos != Shapes.size())
+				Shapes.pop_back();
+
+			Shape * New = Shape::factory(tempMethod);
+
+			Shapes.push_back(New);
+			Shapes.back()->addPoint(a);
+			if (Shapes.back()->numPoint() < 2) {
+				Shapes.back()->type = tempMethod;
+				Shapes.back()->setColor(tempColor);
+				Shapes.back()->setIsFill(tempIsFill);
+				Shapes.back()->setBrush(lb);
+				Shapes.back()->setVisible();
+				Shapes.back()->setStyle(tempPenStyle);
+				Shapes.back()->setFont(tempFont);
+				Shapes.back()->setText(text);
+				Shapes.back()->setWidth(tempWidth);
+				statusPos++;
+			}
 			break;
 		}
 		default:
@@ -782,6 +875,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			selectZone.right = a.x;
 			selectZone.bottom = a.y;
+			break;
+		}
+		case CONTROL_TEXT:
+		{
+			Shapes.back()->MouseMove(a);
 			break;
 		}
 		default:
@@ -1256,6 +1354,99 @@ INT_PTR CALLBACK Brush(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 
+// Message handler for text box.
+INT_PTR CALLBACK Text(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+	{
+		formatTextColor = RGB(255, 0, 0);
+		return (INT_PTR)TRUE;
+	}
+	case WM_DRAWITEM:
+	{
+		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
+		if (pDIS->CtlID == IDC_PREVIEW_TEXT)
+		{
+			RECT rcClient;
+			GetClientRect(hDlg, &rcClient);
+			FillRect(pDIS->hDC, &rcClient, (HBRUSH)(COLOR_WINDOW));
+			LPWSTR message = formatText;
+			RECT rect = { 0,0,50,50 };
+
+			SelectObject(pDIS->hDC, formatTextFont);
+			SetTextColor(pDIS->hDC, formatTextColor);
+
+			DrawText(pDIS->hDC, message, -1, &rect, DT_SINGLELINE | DT_NOCLIP);
+		}
+		return TRUE;
+	}
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case IDC_TEXT:
+		{
+			switch (HIWORD(wParam))
+			{
+			case EN_CHANGE:
+				GetDlgItemText(hDlg, IDC_TEXT, formatText, sizeof(formatText));
+				RECT rect;
+				HWND hControl = GetDlgItem(hDlg, IDC_PREVIEW_TEXT);
+				GetClientRect(hControl, &rect);
+				InvalidateRect(hControl, &rect, TRUE);
+				UpdateWindow(hControl);
+				break;
+			}
+			break;
+		}
+		case IDC_FONT:
+		{
+			switch (HIWORD(wParam))
+			{
+			case BN_CLICKED:
+			{
+				FontPickerDialog(hDlg, formatTextFont, formatTextColor);
+
+				RECT rect;
+				HWND hControl = GetDlgItem(hDlg, IDC_PREVIEW_TEXT);
+				GetClientRect(hControl, &rect);
+				InvalidateRect(hControl, &rect, TRUE);
+				UpdateWindow(hControl);
+			}
+			}
+			break;
+		}
+		case IDOK:
+		{
+			tempFont = formatTextFont;
+			tempColor = formatTextColor;
+			int i = 0;
+			while (formatText[i])
+			{
+				text[i] = formatText[i];
+				i++;
+			}
+			text[i] = '\0';
+
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		case IDCANCEL:
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		}
+
+		break;
+	}
+	return (INT_PTR)FALSE;
+}
+
+
+
 VOID ColorPickerDialog(HWND hWnd, COLORREF &color)
 {
 	//MSDN example
@@ -1275,4 +1466,26 @@ VOID ColorPickerDialog(HWND hWnd, COLORREF &color)
 		InvalidateRect(hWnd, NULL, true);
 	}
 
+}
+
+
+VOID FontPickerDialog(HWND hWnd, HFONT &font, DWORD &rgb)
+{
+	CHOOSEFONT cf; // common dialog box structure
+	static LOGFONT lf; // logical font structure
+	static DWORD rgbCurrent; // current text color
+	HFONT hfont;
+
+	// Initialize CHOOSEFONT
+	ZeroMemory(&cf, sizeof(CHOOSEFONT));
+	cf.lStructSize = sizeof(CHOOSEFONT);
+	cf.hwndOwner = hWnd;
+	cf.lpLogFont = &lf;
+	cf.rgbColors = rgbCurrent;
+	cf.Flags = CF_SCREENFONTS | CF_EFFECTS;
+
+	if (ChooseFont(&cf) == TRUE) {
+		font = CreateFontIndirectW(cf.lpLogFont);
+		rgb = cf.rgbColors;
+	}
 }

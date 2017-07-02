@@ -10,11 +10,15 @@
 #define DRAW_SQUARE		5
 #define DRAW_ROUND		6
 #define DRAW_IMAGE		7
+#define DRAW_TEXT		8
 #define CONTROL_DRAW	0
 #define CONTROL_MOVE	1
 #define CONTROL_SCALE	2
 #define CONTROL_TEXT	3
 #define CONTROL_SELECT	4
+#define CONTROL_COPY	5
+#define CONTROL_CUT		6
+#define CONTROL_PASTE	7
 
 
 class Shape {
@@ -50,6 +54,10 @@ public:
 	virtual void MouseUp(POINT) = 0;
 	virtual void setFilename(LPWSTR) = 0;
 	virtual LPWSTR getFilename() = 0;
+	virtual void setText(LPWSTR) = 0;
+	virtual LPWSTR getText() = 0;
+	virtual void setFont(HFONT) = 0;
+	virtual HFONT getFont() = 0;
 	virtual void draw(HDC buffDC) = 0;
 };
 
@@ -69,6 +77,10 @@ public:
 	void MouseUp(POINT);
 	void setFilename(LPWSTR);
 	LPWSTR getFilename();
+	void setText(LPWSTR);
+	LPWSTR getText();
+	void setFont(HFONT);
+	HFONT getFont();
 	void draw(HDC);
 };
 
@@ -84,6 +96,10 @@ public:
 	void MouseUp(POINT);
 	void setFilename(LPWSTR);
 	LPWSTR getFilename();
+	void setText(LPWSTR);
+	LPWSTR getText();
+	void setFont(HFONT);
+	HFONT getFont();
 	void draw(HDC);
 };
 
@@ -103,6 +119,10 @@ public:
 	void MouseUp(POINT);
 	void setFilename(LPWSTR);
 	LPWSTR getFilename();
+	void setText(LPWSTR);
+	LPWSTR getText();
+	void setFont(HFONT);
+	HFONT getFont();
 	void draw(HDC);
 };
 
@@ -118,6 +138,10 @@ public:
 	void MouseUp(POINT);
 	void setFilename(LPWSTR);
 	LPWSTR getFilename();
+	void setText(LPWSTR);
+	LPWSTR getText();
+	void setFont(HFONT);
+	HFONT getFont();
 	void draw(HDC);
 };
 
@@ -137,6 +161,10 @@ public:
 	void MouseUp(POINT);
 	void setFilename(LPWSTR);
 	LPWSTR getFilename();
+	void setText(LPWSTR);
+	LPWSTR getText();
+	void setFont(HFONT);
+	HFONT getFont();
 	void draw(HDC);
 };
 
@@ -156,6 +184,10 @@ public:
 	void MouseUp(POINT);
 	void setFilename(LPWSTR);
 	LPWSTR getFilename();
+	void setText(LPWSTR);
+	LPWSTR getText();
+	void setFont(HFONT);
+	HFONT getFont();
 	void draw(HDC);
 };
 
@@ -173,12 +205,17 @@ public:
 	void MouseUp(POINT);
 	void setFilename(LPWSTR);
 	LPWSTR getFilename();
+	void setText(LPWSTR);
+	LPWSTR getText();
+	void setFont(HFONT);
+	HFONT getFont();
 	void draw(HDC);
 };
 
 class MText : public Shape {
 public:
 	TCHAR text[260];
+	HFONT font;
 
 	bool checkFill();
 	void setIsFill(bool);
@@ -190,6 +227,10 @@ public:
 	void MouseUp(POINT);
 	void setFilename(LPWSTR);
 	LPWSTR getFilename();
+	void setText(LPWSTR);
+	LPWSTR getText();
+	void setFont(HFONT);
+	HFONT getFont();
 	void draw(HDC);
 };
 
